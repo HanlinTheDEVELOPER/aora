@@ -21,6 +21,7 @@ const TabIcon = ({ name, color, focused, icon }) => {
 		</View>
 	);
 };
+
 const TabLayout = () => {
 	return (
 		<>

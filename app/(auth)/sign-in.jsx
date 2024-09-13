@@ -1,7 +1,7 @@
 import { Link, router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,40 +9,28 @@ import { CustomButton, FormField } from "../../components";
 import images from "../../constants/images";
 import { useGlobalContext } from "../../context/global-context";
 import { auth } from "../../firebaseConfig";
-import { create } from "../../lib/firestore.crud";
+import { findOnebyEmail } from "../../lib/firestore.crud";
 
-const SignUp = () => {
+const SignIn = () => {
 	const { setAuth } = useGlobalContext();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [form, setForm] = useState({
-		username: "",
 		email: "",
 		password: "",
 	});
-
 	const submit = async () => {
-		const { username, email, password } = form;
 		setIsSubmitting(true);
 		try {
-			const user = await create("users", { email, username });
-			await createUserWithEmailAndPassword(auth, email, password);
-			setIsSubmitting(false);
-			await SecureStore.setItemAsync(
+			const res = await signInWithEmailAndPassword(
 				auth,
-				JSON.stringify({
-					id: user,
-					email,
-					username,
-					avatar: "https://placehold.co/400.png",
-				})
+				form.email,
+				form.password
 			);
-			setAuth({
-				id: user,
-				email,
-				username,
-				avatar: "https://placehold.co/400.png",
-			});
+			const user = await findOnebyEmail("users", form.email);
+			await SecureStore.setItemAsync("auth", JSON.stringify(user));
+			setAuth(user);
 			router.replace("/home");
+			setIsSubmitting(false);
 		} catch (error) {
 			console.log("error", error);
 			setIsSubmitting(false);
@@ -59,15 +47,8 @@ const SignUp = () => {
 						resizeMode="contain"
 					/>
 					<Text className="text-white font-semibold text-xl">
-						Sign up to Aora
+						Log in to Aora
 					</Text>
-					<FormField
-						value={form.username}
-						placeholder="Username"
-						title="Username"
-						handleChange={(e) => setForm((form) => ({ ...form, username: e }))}
-						otherStyles="mt-5 text-white"
-					/>
 					<FormField
 						value={form.email}
 						placeholder="Email"
@@ -84,20 +65,20 @@ const SignUp = () => {
 						otherStyles="mt-5 text-white"
 					/>
 					<CustomButton
-						title="Sign Up"
+						title="Sign In"
 						handlePress={submit}
 						containerStyles="mt-7"
 						isLoading={isSubmitting}
 					/>
 					<View className="flex justify-center pt-5 flex-row gap-2">
 						<Text className="text-lg text-gray-100 font-pregular">
-							Already have an account?
+							Don't have an account?
 						</Text>
 						<Link
-							href="/sign-in"
+							href="/sign-up"
 							className="text-lg font-psemibold text-secondary"
 						>
-							Sign in
+							Signup
 						</Link>
 					</View>
 				</View>
@@ -107,4 +88,4 @@ const SignUp = () => {
 	);
 };
 
-export default SignUp;
+export default SignIn;

@@ -1,7 +1,9 @@
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { Animated } from "react-native";
+import GlobalContextProvider from "../context/global-context";
 
 const RootLayout = () => {
 	const [fontsLoaded, error] = useFonts({
@@ -15,30 +17,25 @@ const RootLayout = () => {
 		"Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
 		"Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
 	});
-
+	const opacity = new Animated.Value(1);
 	useEffect(() => {
-		if (error) throw error;
-
-		if (fontsLoaded) SplashScreen.hideAsync();
+		(async () => {
+			if (error) throw error;
+			if (fontsLoaded) await SplashScreen.hideAsync();
+		})();
 	}, [fontsLoaded, error]);
-
 	if (!fontsLoaded && !error) return null;
 
 	return (
-		<Stack>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
-			<Stack.Screen name="setting" options={{ headerShown: true }} />
-		</Stack>
+		<GlobalContextProvider>
+			<Stack>
+				<Stack.Screen name="index" options={{ headerShown: false }} />
+				<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+				<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+			</Stack>
+			<StatusBar style="light" />
+		</GlobalContextProvider>
 	);
 };
 
 export default RootLayout;
-
-const styles = StyleSheet.create({
-	container: {
-		display: "flex",
-		flex: 1,
-		alignItems: "center",
-		justifyContent: "center",
-	},
-});
