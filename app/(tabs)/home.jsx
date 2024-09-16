@@ -23,7 +23,7 @@ const Home = () => {
 	return (
 		<SafeAreaView className="bg-primary h-full ">
 			<FlatList
-				className="py-2"
+				className="pt-2 pb-0"
 				data={videos}
 				keyExtractor={(item) => item.createdAt}
 				renderItem={({ item }) => <VideoPost item={item} />}
@@ -57,14 +57,18 @@ const Home = () => {
 						</View>
 					</>
 				)}
-				ListEmptyComponent={() => <EmptyList />}
+				ListEmptyComponent={() => (
+					<EmptyList
+						title="No Videos Found"
+						subtitle="Be the first to upload a video"
+					/>
+				)}
 				refreshControl={
 					<RefreshControl
 						colors={["#FF9C01"]}
 						tintColor="#FF9C01"
 						refreshing={refreshing}
 						onRefresh={() => {
-							console.log("refreshing");
 							handleRefresh();
 						}}
 					/>

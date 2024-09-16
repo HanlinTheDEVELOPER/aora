@@ -2,6 +2,7 @@ import * as SecureStore from "expo-secure-store";
 import { initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 const firebaseConfig = {
 	apiKey: "AIzaSyBjr4xY_E0-gi_L7HIOyQTCRLmHA2Kwrik",
 	authDomain: "aora-cf441.firebaseapp.com",
@@ -17,4 +18,6 @@ const auth = initializeAuth(app, {
 	persistence: getReactNativePersistence(SecureStore),
 });
 const db = getFirestore(app);
-export { app, auth, db };
+const storage = getStorage(app);
+
+export { app, auth, db, storage };
